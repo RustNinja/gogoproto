@@ -42,7 +42,7 @@ import (
 const (
 	// Seconds field of the earliest valid Timestamp.
 	// This is time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC).Unix().
-	minValidSeconds = -62135596800
+	// minValidSeconds = -62135596800
 	// Seconds field just after the latest valid Timestamp.
 	// This is time.Date(10000, 1, 1, 0, 0, 0, 0, time.UTC).Unix().
 	maxValidSeconds = 253402300800
@@ -62,9 +62,9 @@ func validateTimestamp(ts *Timestamp) error {
 	if ts == nil {
 		return errors.New("timestamp: nil Timestamp")
 	}
-	if ts.Seconds < minValidSeconds {
-		return fmt.Errorf("timestamp: %#v before 0001-01-01", ts)
-	}
+	// if ts.Seconds < minValidSeconds {
+	// 	return fmt.Errorf("timestamp: %#v before 0001-01-01", ts)
+	// }
 	if ts.Seconds >= maxValidSeconds {
 		return fmt.Errorf("timestamp: %#v after 10000-01-01", ts)
 	}
@@ -92,7 +92,7 @@ func TimestampFromProto(ts *Timestamp) (time.Time, error) {
 	if ts == nil {
 		t = time.Unix(0, 0).UTC() // treat nil like the empty Timestamp
 	} else {
-		t = time.Unix(ts.Seconds, int64(ts.Nanos)).UTC()
+		t = time.Unix(int64(ts.Seconds), int64(ts.Nanos)).UTC()
 	}
 	return t, validateTimestamp(ts)
 }
@@ -110,8 +110,8 @@ func TimestampNow() *Timestamp {
 // It returns an error if the resulting Timestamp is invalid.
 func TimestampProto(t time.Time) (*Timestamp, error) {
 	ts := &Timestamp{
-		Seconds: t.Unix(),
-		Nanos:   int32(t.Nanosecond()),
+		Seconds: uint64(t.Unix()),
+		Nanos:   uint32(t.Nanosecond()),
 	}
 	if err := validateTimestamp(ts); err != nil {
 		return nil, err
