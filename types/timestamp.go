@@ -110,8 +110,8 @@ func TimestampNow() *Timestamp {
 // It returns an error if the resulting Timestamp is invalid.
 func TimestampProto(t time.Time) (*Timestamp, error) {
 	ts := &Timestamp{
-		Seconds: uint64(t.Unix()),
-		Nanos:   uint32(t.Nanosecond()),
+		Seconds: int64(t.Unix()),
+		Nanos:   int32(t.Nanosecond()),
 	}
 	if err := validateTimestamp(ts); err != nil {
 		return nil, err
