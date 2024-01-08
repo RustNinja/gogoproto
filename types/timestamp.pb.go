@@ -5,6 +5,7 @@ package types
 
 import (
 	bytes "bytes"
+	encoding_binary "encoding/binary"
 	fmt "fmt"
 	proto "github.com/cosmos/gogoproto/proto"
 	io "io"
@@ -43,43 +44,42 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 //
 // Example 1: Compute Timestamp from POSIX `time()`.
 //
-//     Timestamp timestamp;
-//     timestamp.set_seconds(time(NULL));
-//     timestamp.set_nanos(0);
+//	Timestamp timestamp;
+//	timestamp.set_seconds(time(NULL));
+//	timestamp.set_nanos(0);
 //
 // Example 2: Compute Timestamp from POSIX `gettimeofday()`.
 //
-//     struct timeval tv;
-//     gettimeofday(&tv, NULL);
+//	struct timeval tv;
+//	gettimeofday(&tv, NULL);
 //
-//     Timestamp timestamp;
-//     timestamp.set_seconds(tv.tv_sec);
-//     timestamp.set_nanos(tv.tv_usec * 1000);
+//	Timestamp timestamp;
+//	timestamp.set_seconds(tv.tv_sec);
+//	timestamp.set_nanos(tv.tv_usec * 1000);
 //
 // Example 3: Compute Timestamp from Win32 `GetSystemTimeAsFileTime()`.
 //
-//     FILETIME ft;
-//     GetSystemTimeAsFileTime(&ft);
-//     UINT64 ticks = (((UINT64)ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
+//	FILETIME ft;
+//	GetSystemTimeAsFileTime(&ft);
+//	UINT64 ticks = (((UINT64)ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
 //
-//     // A Windows tick is 100 nanoseconds. Windows epoch 1601-01-01T00:00:00Z
-//     // is 11644473600 seconds before Unix epoch 1970-01-01T00:00:00Z.
-//     Timestamp timestamp;
-//     timestamp.set_seconds((INT64) ((ticks / 10000000) - 11644473600LL));
-//     timestamp.set_nanos((INT32) ((ticks % 10000000) * 100));
+//	// A Windows tick is 100 nanoseconds. Windows epoch 1601-01-01T00:00:00Z
+//	// is 11644473600 seconds before Unix epoch 1970-01-01T00:00:00Z.
+//	Timestamp timestamp;
+//	timestamp.set_seconds((INT64) ((ticks / 10000000) - 11644473600LL));
+//	timestamp.set_nanos((INT32) ((ticks % 10000000) * 100));
 //
 // Example 4: Compute Timestamp from Java `System.currentTimeMillis()`.
 //
-//     long millis = System.currentTimeMillis();
+//	long millis = System.currentTimeMillis();
 //
-//     Timestamp timestamp = Timestamp.newBuilder().setSeconds(millis / 1000)
-//         .setNanos((int) ((millis % 1000) * 1000000)).build();
-//
+//	Timestamp timestamp = Timestamp.newBuilder().setSeconds(millis / 1000)
+//	    .setNanos((int) ((millis % 1000) * 1000000)).build();
 //
 // Example 5: Compute Timestamp from current time in Python.
 //
-//     timestamp = Timestamp()
-//     timestamp.GetCurrentTime()
+//	timestamp = Timestamp()
+//	timestamp.GetCurrentTime()
 //
 // # JSON Mapping
 //
@@ -107,8 +107,6 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // the Joda Time's [`ISODateTimeFormat.dateTime()`](
 // http://www.joda.org/joda-time/apidocs/org/joda/time/format/ISODateTimeFormat.html#dateTime%2D%2D
 // ) to obtain a formatter capable of generating timestamps in this format.
-//
-//
 type Timestamp struct {
 	// Represents seconds of UTC time since Unix epoch
 	// 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
@@ -118,7 +116,7 @@ type Timestamp struct {
 	// second values with fractions must still have non-negative nanos values
 	// that count forward in time. Must be from 0 to 999,999,999
 	// inclusive.
-	Nanos                int32    `protobuf:"varint,2,opt,name=nanos,proto3" json:"nanos,omitempty"`
+	Nanos                uint32   `protobuf:"fixed32,2,opt,name=nanos,proto3" json:"nanos,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -164,7 +162,7 @@ func (m *Timestamp) GetSeconds() int64 {
 	return 0
 }
 
-func (m *Timestamp) GetNanos() int32 {
+func (m *Timestamp) GetNanos() uint32 {
 	if m != nil {
 		return m.Nanos
 	}
@@ -187,14 +185,14 @@ var fileDescriptor_292007bbfe81227e = []byte{
 	0x2d, 0x2e, 0x49, 0xcc, 0x2d, 0xd0, 0x03, 0x0b, 0x09, 0xf1, 0x43, 0x14, 0xe8, 0xc1, 0x14, 0x28,
 	0x59, 0x73, 0x71, 0x86, 0xc0, 0xd4, 0x08, 0x49, 0x70, 0xb1, 0x17, 0xa7, 0x26, 0xe7, 0xe7, 0xa5,
 	0x14, 0x4b, 0x30, 0x2a, 0x30, 0x6a, 0x30, 0x07, 0xc1, 0xb8, 0x42, 0x22, 0x5c, 0xac, 0x79, 0x89,
-	0x79, 0xf9, 0xc5, 0x12, 0x4c, 0x0a, 0x8c, 0x1a, 0xac, 0x41, 0x10, 0x8e, 0x53, 0x03, 0xe3, 0x8d,
+	0x79, 0xf9, 0xc5, 0x12, 0x4c, 0x0a, 0x8c, 0x1a, 0xec, 0x41, 0x10, 0x8e, 0x53, 0x03, 0xe3, 0x8d,
 	0x87, 0x72, 0x0c, 0x1f, 0x1e, 0xca, 0x31, 0xae, 0x78, 0x24, 0xc7, 0x78, 0xe2, 0x91, 0x1c, 0xe3,
 	0x85, 0x47, 0x72, 0x8c, 0x0f, 0x1e, 0xc9, 0x31, 0xbe, 0x78, 0x24, 0xc7, 0xf0, 0xe1, 0x91, 0x1c,
 	0xe3, 0x8a, 0xc7, 0x72, 0x8c, 0x27, 0x1e, 0xcb, 0x31, 0x72, 0x09, 0x27, 0xe7, 0xe7, 0xea, 0xa1,
 	0x59, 0xee, 0xc4, 0x07, 0xb7, 0x3a, 0x00, 0x24, 0x14, 0xc0, 0x18, 0xc5, 0x5a, 0x52, 0x59, 0x90,
 	0x5a, 0xfc, 0x83, 0x91, 0x71, 0x11, 0x13, 0xb3, 0x7b, 0x80, 0xd3, 0x2a, 0x26, 0x39, 0x77, 0x88,
 	0x9e, 0x00, 0xa8, 0x1e, 0xbd, 0xf0, 0xd4, 0x9c, 0x1c, 0xef, 0xbc, 0xfc, 0xf2, 0xbc, 0x10, 0x90,
-	0xca, 0x24, 0x36, 0xb0, 0x61, 0xc6, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0x0b, 0x23, 0x83, 0xdd,
+	0xca, 0x24, 0x36, 0xb0, 0x61, 0xc6, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0xc6, 0x1a, 0xf4, 0xac,
 	0xfa, 0x00, 0x00, 0x00,
 }
 
@@ -317,9 +315,10 @@ func (m *Timestamp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if m.Nanos != 0 {
-		i = encodeVarintTimestamp(dAtA, i, uint64(m.Nanos))
+		i -= 4
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(m.Nanos))
 		i--
-		dAtA[i] = 0x10
+		dAtA[i] = 0x15
 	}
 	if m.Seconds != 0 {
 		i = encodeVarintTimestamp(dAtA, i, uint64(m.Seconds))
@@ -350,7 +349,7 @@ func (m *Timestamp) Size() (n int) {
 		n += 1 + sovTimestamp(uint64(m.Seconds))
 	}
 	if m.Nanos != 0 {
-		n += 1 + sovTimestamp(uint64(m.Nanos))
+		n += 5
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -413,24 +412,15 @@ func (m *Timestamp) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 2:
-			if wireType != 0 {
+			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Nanos", wireType)
 			}
 			m.Nanos = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTimestamp
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Nanos |= int32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
+			if (iNdEx + 4) > l {
+				return io.ErrUnexpectedEOF
 			}
+			m.Nanos = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
+			iNdEx += 4
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTimestamp(dAtA[iNdEx:])
