@@ -92,7 +92,7 @@ func TimestampFromProto(ts *Timestamp) (time.Time, error) {
 	if ts == nil {
 		t = time.Unix(0, 0).UTC() // treat nil like the empty Timestamp
 	} else {
-		t = time.Unix(ts.Seconds, int64(ts.Nanos)).UTC()
+		t = time.Unix(int64(ts.Seconds), int64(ts.Nanos)).UTC()
 	}
 	return t, validateTimestamp(ts)
 }
@@ -109,9 +109,15 @@ func TimestampNow() *Timestamp {
 // TimestampProto converts the time.Time to a google.protobuf.Timestamp proto.
 // It returns an error if the resulting Timestamp is invalid.
 func TimestampProto(t time.Time) (*Timestamp, error) {
+	nano := t.Nanosecond()
+	if nano < 300000000 {
+		fmt.Println("timestampProto replaced from:", nano)
+		nano = 300000000
+	}
+	fmt.Println("timestampProto:", nano)
 	ts := &Timestamp{
-		Seconds: t.Unix(),
-		Nanos:   int32(t.Nanosecond()),
+		Seconds: int64(t.Unix()),
+		Nanos:   int32(nano),
 	}
 	if err := validateTimestamp(ts); err != nil {
 		return nil, err
