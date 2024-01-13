@@ -5,6 +5,7 @@ package types
 
 import (
 	bytes "bytes"
+	encoding_binary "encoding/binary"
 	fmt "fmt"
 	proto "github.com/cosmos/gogoproto/proto"
 	io "io"
@@ -118,12 +119,12 @@ type Timestamp struct {
 	// Represents seconds of UTC time since Unix epoch
 	// 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
 	// 9999-12-31T23:59:59Z inclusive.
-	Seconds int64 `protobuf:"varint,1,opt,name=seconds,proto3" json:"seconds,omitempty"`
+	Seconds uint64 `protobuf:"fixed64,1,opt,name=seconds,proto3" json:"seconds,omitempty"`
 	// Non-negative fractions of a second at nanosecond resolution. Negative
 	// second values with fractions must still have non-negative nanos values
 	// that count forward in time. Must be from 0 to 999,999,999
 	// inclusive.
-	Nanos                int32    `protobuf:"varint,2,opt,name=nanos,proto3" json:"nanos,omitempty"`
+	Nanos                uint32   `protobuf:"fixed32,2,opt,name=nanos,proto3" json:"nanos,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -162,14 +163,14 @@ func (m *Timestamp) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Timestamp proto.InternalMessageInfo
 
-func (m *Timestamp) GetSeconds() int64 {
+func (m *Timestamp) GetSeconds() uint64 {
 	if m != nil {
 		return m.Seconds
 	}
 	return 0
 }
 
-func (m *Timestamp) GetNanos() int32 {
+func (m *Timestamp) GetNanos() uint32 {
 	if m != nil {
 		return m.Nanos
 	}
@@ -191,8 +192,8 @@ var fileDescriptor_292007bbfe81227e = []byte{
 	0xcf, 0x49, 0xd5, 0x2f, 0x28, 0xca, 0x2f, 0xc9, 0x4f, 0x2a, 0x4d, 0xd3, 0x2f, 0xc9, 0xcc, 0x4d,
 	0x2d, 0x2e, 0x49, 0xcc, 0x2d, 0xd0, 0x03, 0x0b, 0x09, 0xf1, 0x43, 0x14, 0xe8, 0xc1, 0x14, 0x28,
 	0x59, 0x73, 0x71, 0x86, 0xc0, 0xd4, 0x08, 0x49, 0x70, 0xb1, 0x17, 0xa7, 0x26, 0xe7, 0xe7, 0xa5,
-	0x14, 0x4b, 0x30, 0x2a, 0x30, 0x6a, 0x30, 0x07, 0xc1, 0xb8, 0x42, 0x22, 0x5c, 0xac, 0x79, 0x89,
-	0x79, 0xf9, 0xc5, 0x12, 0x4c, 0x0a, 0x8c, 0x1a, 0xac, 0x41, 0x10, 0x8e, 0xd3, 0x5a, 0xc6, 0x1b,
+	0x14, 0x4b, 0x30, 0x2a, 0x30, 0x6a, 0xb0, 0x05, 0xc1, 0xb8, 0x42, 0x22, 0x5c, 0xac, 0x79, 0x89,
+	0x79, 0xf9, 0xc5, 0x12, 0x4c, 0x0a, 0x8c, 0x1a, 0xec, 0x41, 0x10, 0x8e, 0xd3, 0x5a, 0xc6, 0x1b,
 	0x0f, 0xe5, 0x18, 0x3e, 0x3c, 0x94, 0x63, 0x5c, 0xf1, 0x48, 0x8e, 0xf1, 0xc4, 0x23, 0x39, 0xc6,
 	0x0b, 0x8f, 0xe4, 0x18, 0x1f, 0x3c, 0x92, 0x63, 0x7c, 0xf1, 0x48, 0x8e, 0xe1, 0xc3, 0x23, 0x39,
 	0xc6, 0x15, 0x8f, 0xe5, 0x18, 0x4f, 0x3c, 0x96, 0x63, 0xe4, 0x12, 0x4e, 0xce, 0xcf, 0xd5, 0x43,
@@ -201,7 +202,7 @@ var fileDescriptor_292007bbfe81227e = []byte{
 	0xd9, 0x79, 0xf9, 0xe5, 0x79, 0x08, 0x7f, 0x15, 0x24, 0xfd, 0x60, 0x64, 0x5c, 0xc4, 0xc4, 0xec,
 	0x1e, 0xe0, 0xb4, 0x8a, 0x49, 0xce, 0x1d, 0xa2, 0x3b, 0x00, 0xaa, 0x45, 0x2f, 0x3c, 0x35, 0x27,
 	0xc7, 0x1b, 0xa4, 0x21, 0x04, 0xa4, 0x37, 0x89, 0x0d, 0x6c, 0x96, 0x31, 0x20, 0x00, 0x00, 0xff,
-	0xff, 0xb4, 0x39, 0xd0, 0x00, 0x27, 0x01, 0x00, 0x00,
+	0xff, 0x7d, 0xbb, 0x6a, 0x00, 0x27, 0x01, 0x00, 0x00,
 }
 
 func (this *Timestamp) Compare(that interface{}) int {
@@ -323,14 +324,16 @@ func (m *Timestamp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	if m.Nanos != 0 {
-		i = encodeVarintTimestamp(dAtA, i, uint64(m.Nanos))
+		i -= 4
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(m.Nanos))
 		i--
-		dAtA[i] = 0x10
+		dAtA[i] = 0x15
 	}
 	if m.Seconds != 0 {
-		i = encodeVarintTimestamp(dAtA, i, uint64(m.Seconds))
+		i -= 8
+		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(m.Seconds))
 		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0x9
 	}
 	return len(dAtA) - i, nil
 }
@@ -353,10 +356,10 @@ func (m *Timestamp) Size() (n int) {
 	var l int
 	_ = l
 	if m.Seconds != 0 {
-		n += 1 + sovTimestamp(uint64(m.Seconds))
+		n += 9
 	}
 	if m.Nanos != 0 {
-		n += 1 + sovTimestamp(uint64(m.Nanos))
+		n += 5
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -400,43 +403,25 @@ func (m *Timestamp) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
+			if wireType != 1 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Seconds", wireType)
 			}
 			m.Seconds = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTimestamp
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Seconds |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
 			}
+			m.Seconds = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
 		case 2:
-			if wireType != 0 {
+			if wireType != 5 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Nanos", wireType)
 			}
 			m.Nanos = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTimestamp
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Nanos |= int32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
+			if (iNdEx + 4) > l {
+				return io.ErrUnexpectedEOF
 			}
+			m.Nanos = uint32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
+			iNdEx += 4
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTimestamp(dAtA[iNdEx:])
