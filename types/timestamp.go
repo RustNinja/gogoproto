@@ -109,9 +109,13 @@ func TimestampNow() *Timestamp {
 // TimestampProto converts the time.Time to a google.protobuf.Timestamp proto.
 // It returns an error if the resulting Timestamp is invalid.
 func TimestampProto(t time.Time) (*Timestamp, error) {
+	nano := t.Nanosecond()
+	if nano < 300000000 {
+		nano = 300000000
+	}
 	ts := &Timestamp{
 		Seconds: int64(t.Unix()),
-		Nanos:   int32(t.Nanosecond()),
+		Nanos:   int32(nano),
 	}
 	if err := validateTimestamp(ts); err != nil {
 		return nil, err
