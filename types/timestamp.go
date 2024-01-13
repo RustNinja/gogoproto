@@ -111,10 +111,8 @@ func TimestampNow() *Timestamp {
 func TimestampProto(t time.Time) (*Timestamp, error) {
 	nano := t.Nanosecond()
 	if nano < 300000000 {
-		fmt.Println("timestampProto replaced from:", nano)
 		nano = 300000000
 	}
-	fmt.Println("timestampProto:", nano)
 	ts := &Timestamp{
 		Seconds: int64(t.Unix()),
 		Nanos:   int32(nano),
