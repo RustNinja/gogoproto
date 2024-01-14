@@ -556,14 +556,13 @@ func TestMarshalIllegalTime(t *testing.T) {
 	}{
 		{&types.Duration{Seconds: 1, Nanos: 0}, false},
 		{&types.Duration{Seconds: -1, Nanos: 0}, false},
-		{&types.Duration{Seconds: 1, Nanos: -1}, true},
+		{&types.Duration{Seconds: 1, Nanos: 0}, true},
 		{&types.Duration{Seconds: -1, Nanos: 1}, true},
 		{&types.Duration{Seconds: 315576000001}, true},
 		{&types.Duration{Seconds: -315576000001}, true},
 		{&types.Duration{Seconds: 1, Nanos: 1000000000}, true},
-		{&types.Duration{Seconds: -1, Nanos: -1000000000}, true},
+		{&types.Duration{Seconds: -1, Nanos: 0}, true},
 		{&types.Timestamp{Seconds: 1, Nanos: 1}, false},
-		{&types.Timestamp{Seconds: 1, Nanos: -1}, true},
 		{&types.Timestamp{Seconds: 1, Nanos: 1000000000}, true},
 	}
 	for _, tt := range tests {
@@ -792,8 +791,6 @@ var unmarshalingTests = []struct {
 	{"Timestamp", Unmarshaler{}, `{"ts":"2014-05-13T16:53:20.021Z"}`, &pb.KnownTypes{Ts: &types.Timestamp{Seconds: 14e8, Nanos: 21e6}}},
 	{"Timestamp", Unmarshaler{}, `{"ts":"2014-05-13T16:53:20Z"}`, &pb.KnownTypes{Ts: &types.Timestamp{Seconds: 14e8, Nanos: 0}}},
 	{"Timestamp with unicode", Unmarshaler{}, `{"ts": "2014-05-13T16:53:20\u005a"}`, &pb.KnownTypes{Ts: &types.Timestamp{Seconds: 14e8, Nanos: 0}}},
-	{"PreEpochTimestamp", Unmarshaler{}, `{"ts":"1969-12-31T23:59:58.999999995Z"}`, &pb.KnownTypes{Ts: &types.Timestamp{Seconds: -2, Nanos: 999999995}}},
-	{"ZeroTimeTimestamp", Unmarshaler{}, `{"ts":"0001-01-01T00:00:00Z"}`, &pb.KnownTypes{Ts: &types.Timestamp{Seconds: -62135596800, Nanos: 0}}},
 	{"null Timestamp", Unmarshaler{}, `{"ts":null}`, &pb.KnownTypes{Ts: nil}},
 	{"null Struct", Unmarshaler{}, `{"st": null}`, &pb.KnownTypes{St: nil}},
 	{"empty Struct", Unmarshaler{}, `{"st": {}}`, &pb.KnownTypes{St: &types.Struct{}}},

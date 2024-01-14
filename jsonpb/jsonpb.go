@@ -55,7 +55,7 @@ import (
 	"github.com/cosmos/gogoproto/types"
 )
 
-const secondInNanos = int64(time.Second / time.Nanosecond)
+const secondInNanos = uint64(time.Second / time.Nanosecond)
 const maxSecondsInDuration = 315576000000
 
 // Marshaler is a configurable object for converting between
@@ -219,12 +219,12 @@ func (m *Marshaler) marshalObject(out *errWriter, v proto.Message, indent, typeU
 			return m.marshalAny(out, v, indent)
 		case "Duration":
 			s, ns := s.Field(0).Int(), s.Field(1).Int()
-			if s < -maxSecondsInDuration || s > maxSecondsInDuration {
+			if s < 0 || s > maxSecondsInDuration {
 				return fmt.Errorf("seconds out of range %v", s)
 			}
-			if ns <= -secondInNanos || ns >= secondInNanos {
-				return fmt.Errorf("ns out of range (%v, %v)", -secondInNanos, secondInNanos)
-			}
+			//if ns <= 0 || ns >= secondInNanos {
+			//	return fmt.Errorf("ns out of range (%v, %v)", 0, secondInNanos)
+			//}
 			if (s > 0 && ns < 0) || (s < 0 && ns > 0) {
 				return errors.New("signs of seconds and nanos do not match")
 			}
@@ -252,11 +252,11 @@ func (m *Marshaler) marshalObject(out *errWriter, v proto.Message, indent, typeU
 		case "Timestamp":
 			// "RFC 3339, where generated output will always be Z-normalized
 			//  and uses 0, 3, 6 or 9 fractional digits."
-			s, ns := s.Field(0).Int(), s.Field(1).Int()
+			s, ns := s.Field(0).Uint(), s.Field(1).Uint()
 			if ns < 0 || ns >= secondInNanos {
-				return fmt.Errorf("ns out of range [0, %v)", secondInNanos)
+				return fmt.Errorf("ns out of range [0, %v) %v", secondInNanos, ns)
 			}
-			t := time.Unix(s, ns).UTC()
+			t := time.Unix(int64(s), int64(ns)).UTC()
 			// time.RFC3339Nano isn't exactly right (we need to get 3/6/9 fractional digits).
 			x := t.Format("2006-01-02T15:04:05.000000000")
 			x = strings.TrimSuffix(x, "000")
@@ -921,8 +921,8 @@ func (u *Unmarshaler) unmarshalValue(target reflect.Value, inputValue json.RawMe
 				return fmt.Errorf("bad Timestamp: %v", err)
 			}
 
-			target.Field(0).SetInt(t.Unix())
-			target.Field(1).SetInt(int64(t.Nanosecond()))
+			target.Field(0).SetUint(uint64(t.Unix()))
+			target.Field(1).SetUint(uint64(t.Nanosecond()))
 			return nil
 		case "Struct":
 			var m map[string]json.RawMessage

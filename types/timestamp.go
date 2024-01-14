@@ -42,10 +42,10 @@ import (
 const (
 	// Seconds field of the earliest valid Timestamp.
 	// This is time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC).Unix().
-	minValidSeconds = -62135596800
+	minValidSeconds = 0
 	// Seconds field just after the latest valid Timestamp.
 	// This is time.Date(10000, 1, 1, 0, 0, 0, 0, time.UTC).Unix().
-	maxValidSeconds = 253402300800
+	maxValidSeconds = 18446744011573954817
 )
 
 // validateTimestamp determines whether a Timestamp is valid.
